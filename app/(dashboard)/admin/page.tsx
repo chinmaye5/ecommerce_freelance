@@ -9,7 +9,8 @@ import DashboardStats from "@/components/Admin/DashboardStats";
 import CategoryManager from "@/components/Admin/CategoryManager";
 import AdminProductList from "@/components/Admin/ProductList";
 import AdminManager from "@/components/Admin/AdminManager";
-import { Plus, Package, ClipboardList, BarChart3, Tag, Users } from "lucide-react";
+import CouponManager from "@/components/Admin/CouponManager";
+import { Plus, Package, ClipboardList, BarChart3, Tag, Users, Ticket } from "lucide-react";
 import connectDB from "@/lib/db";
 import Admin from "@/lib/models/Admin";
 
@@ -66,6 +67,7 @@ export default function AdminPage() {
         { id: "orders", label: "Orders", icon: <ClipboardList size={18} /> },
         { id: "products", label: "Products", icon: <Package size={18} /> },
         { id: "categories", label: "Categories", icon: <Tag size={18} /> },
+        { id: "coupons", label: "Coupons", icon: <Ticket size={18} /> },
     ];
 
     if (isSuperAdmin) {
@@ -118,6 +120,7 @@ export default function AdminPage() {
                         }} />
                 )}
                 {activeTab === "categories" && <CategoryManager />}
+                {activeTab === "coupons" && <CouponManager />}
                 {activeTab === "admins" && isSuperAdmin && <AdminManager />}
             </div>
 

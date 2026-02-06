@@ -9,6 +9,13 @@ const ProductSchema = new Schema({
     category: { type: String, required: true },
     stock: { type: Number, required: true, default: 0 },
     unit: { type: String, required: true },
+    hasVariants: { type: Boolean, default: false },
+    variants: [{
+        name: { type: String, required: true }, // e.g. "1kg", "500g"
+        price: { type: Number, required: true },
+        discountedPrice: { type: Number },
+        stock: { type: Number, required: true, default: 0 },
+    }],
     createdAt: { type: Date, default: Date.now },
 });
 

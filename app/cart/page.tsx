@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash2, ShoppingBag, ArrowRight, Minus, Plus, Store, Smartphone, ShieldCheck } from "lucide-react";
+import { Trash2, ShoppingBag, ArrowRight, Minus, Plus, Store, Smartphone, ShieldCheck, Ticket, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -15,6 +15,11 @@ const CartPage = () => {
     const [customerName, setCustomerName] = useState("");
     const [loading, setLoading] = useState(false);
 
+    // Coupon State
+    const [couponCode, setCouponCode] = useState("");
+    const [discount, setDiscount] = useState(0);
+    const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+
     useEffect(() => {
         const savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
         setCart(savedCart);
@@ -24,9 +29,9 @@ const CartPage = () => {
         }
     }, [user]);
 
-    const updateQuantity = (productId: string, delta: number) => {
+    const updateQuantity = (productId: string, delta: number, variant?: string) => {
         const updatedCart = cart.map(item => {
-            if (item.productId === productId) {
+            if (item.productId === productId && item.variant === variant) {
                 const newQty = Math.max(1, item.quantity + delta);
                 return { ...item, quantity: newQty };
             }
@@ -37,8 +42,8 @@ const CartPage = () => {
         window.dispatchEvent(new Event("cartUpdated"));
     };
 
-    const removeItem = (productId: string) => {
-        const updatedCart = cart.filter(item => item.productId !== productId);
+    const removeItem = (productId: string, variant?: string) => {
+        const updatedCart = cart.filter(item => !(item.productId === productId && item.variant === variant));
         setCart(updatedCart);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         window.dispatchEvent(new Event("cartUpdated"));
@@ -46,6 +51,42 @@ const CartPage = () => {
     };
 
     const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const finalTotal = Math.max(0, totalAmount - discount);
+
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) return;
+        const loadingToast = toast.loading("Verifying coupon...");
+        try {
+            const res = await fetch("/api/coupons/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: couponCode, orderTotal: totalAmount }),
+            });
+            const data = await res.json();
+
+            toast.dismiss(loadingToast);
+
+            if (res.ok && data.valid) {
+                setDiscount(data.discountAmount);
+                setAppliedCoupon(data.code);
+                toast.success(`Coupon applied! You saved ₹${data.discountAmount}`);
+            } else {
+                setDiscount(0);
+                setAppliedCoupon(null);
+                toast.error(data.message || "Invalid coupon");
+            }
+        } catch (error) {
+            toast.dismiss(loadingToast);
+            toast.error("Failed to verify coupon");
+        }
+    };
+
+    const removeCoupon = () => {
+        setDiscount(0);
+        setAppliedCoupon(null);
+        setCouponCode("");
+        toast.info("Coupon removed");
+    };
 
     const checkout = async () => {
         if (!isSignedIn) {
@@ -64,7 +105,9 @@ const CartPage = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     items: cart,
-                    totalAmount,
+                    totalAmount: finalTotal,
+                    discount,
+                    couponCode: appliedCoupon,
                     customerName,
                     customerPhone,
                     deliveryAddress: "Store Pickup",
@@ -110,24 +153,27 @@ const CartPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 space-y-4">
                     {cart.map((item) => (
-                        <div key={item.productId} className="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                        <div key={`${item.productId}-${item.variant || 'default'}`} className="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
                             <div className="w-24 h-24 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
                                 <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                             </div>
 
                             <div className="flex-1 flex flex-col justify-between">
                                 <div className="flex justify-between">
-                                    <h3 className="font-bold text-gray-900">{item.name}</h3>
-                                    <button onClick={() => removeItem(item.productId)} className="text-gray-400 hover:text-red-500 transition">
+                                    <div>
+                                        <h3 className="font-bold text-gray-900">{item.name}</h3>
+                                        {item.variant && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">{item.variant}</span>}
+                                    </div>
+                                    <button onClick={() => removeItem(item.productId, item.variant)} className="text-gray-400 hover:text-red-500 transition">
                                         <Trash2 size={18} />
                                     </button>
                                 </div>
 
                                 <div className="flex justify-between items-end mt-2">
                                     <div className="flex items-center gap-3 bg-gray-100 p-1 rounded-lg">
-                                        <button onClick={() => updateQuantity(item.productId, -1)} className="p-1 hover:bg-white rounded transition"><Minus size={14} /></button>
+                                        <button onClick={() => updateQuantity(item.productId, -1, item.variant)} className="p-1 hover:bg-white rounded transition"><Minus size={14} /></button>
                                         <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
-                                        <button onClick={() => updateQuantity(item.productId, 1)} className="p-1 hover:bg-white rounded transition"><Plus size={14} /></button>
+                                        <button onClick={() => updateQuantity(item.productId, 1, item.variant)} className="p-1 hover:bg-white rounded transition"><Plus size={14} /></button>
                                     </div>
                                     <p className="font-bold text-gray-900">₹{item.price * item.quantity}</p>
                                 </div>
@@ -177,13 +223,55 @@ const CartPage = () => {
                         </div>
 
                         <div className="mt-8 pt-8 border-t border-gray-100 space-y-3">
+                            {/* Coupon Section */}
+                            <div className="mb-6">
+                                <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Coupon Code</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter coupon"
+                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-400 uppercase"
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                        disabled={!!appliedCoupon}
+                                    />
+                                    {appliedCoupon ? (
+                                        <button
+                                            onClick={removeCoupon}
+                                            className="px-4 py-2 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-200 transition"
+                                        >
+                                            <X size={20} />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleApplyCoupon}
+                                            disabled={!couponCode}
+                                            className="px-4 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-black transition disabled:opacity-50"
+                                        >
+                                            Apply
+                                        </button>
+                                    )}
+                                </div>
+                                {appliedCoupon && (
+                                    <p className="text-xs text-green-600 font-bold mt-2 flex items-center gap-1">
+                                        <Ticket size={12} /> Coupon {appliedCoupon} applied
+                                    </p>
+                                )}
+                            </div>
+
                             <div className="flex justify-between text-gray-600 text-sm">
                                 <span>Subtotal</span>
                                 <span>₹{totalAmount}</span>
                             </div>
-                            <div className="flex justify-between font-bold text-xl text-gray-900">
+                            {discount > 0 && (
+                                <div className="flex justify-between text-green-600 text-sm font-bold">
+                                    <span>Discount</span>
+                                    <span>-₹{discount}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between font-bold text-xl text-gray-900 pt-2 border-t border-dashed border-gray-200">
                                 <span>Total</span>
-                                <span>₹{totalAmount}</span>
+                                <span>₹{finalTotal}</span>
                             </div>
                         </div>
 

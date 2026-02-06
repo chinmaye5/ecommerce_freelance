@@ -21,6 +21,8 @@ const OrderSchema = new Schema({
     },
     deliveryAddress: { type: String, required: true },
     deliveryOption: { type: String, enum: ['delivery', 'pickup'], default: 'delivery' },
+    discount: { type: Number, default: 0 },
+    couponCode: { type: String },
     createdAt: { type: Date, default: Date.now },
 });
 

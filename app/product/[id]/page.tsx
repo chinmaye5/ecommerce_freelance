@@ -17,6 +17,13 @@ interface Product {
     stock: number;
     unit: string;
     discountedPrice?: number;
+    hasVariants?: boolean;
+    variants?: Array<{
+        name: string;
+        price: number;
+        discountedPrice?: number;
+        stock: number;
+    }>;
 }
 
 const ProductPage = () => {
@@ -24,6 +31,7 @@ const ProductPage = () => {
     const [product, setProduct] = useState<Product | null>(null);
     const [recommendations, setRecommendations] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedVariant, setSelectedVariant] = useState<any>(null);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -31,6 +39,11 @@ const ProductPage = () => {
                 const res = await fetch(`/api/products/${params.id}`);
                 const data = await res.json();
                 setProduct(data);
+
+                // Initialize selected variant
+                if (data.hasVariants && data.variants && data.variants.length > 0) {
+                    setSelectedVariant(data.variants[0]);
+                }
 
                 if (data.category) {
                     const recRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`);
@@ -47,14 +60,22 @@ const ProductPage = () => {
         if (params.id) fetchProduct();
     }, [params.id]);
 
+    const currentPrice = selectedVariant ? selectedVariant.price : product?.price || 0;
+    const currentDiscountPrice = selectedVariant ? selectedVariant.discountedPrice : product?.discountedPrice;
+    const currentStock = selectedVariant ? selectedVariant.stock : product?.stock || 0;
+
     const addToCart = () => {
         if (!product) return;
+
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const existingItem = cart.find((item: any) => item.productId === product._id);
+        const variantName = selectedVariant?.name;
+        const existingItem = cart.find((item: any) =>
+            item.productId === product._id && item.variant === variantName
+        );
 
         if (existingItem) {
-            if (existingItem.quantity + 1 > product.stock) {
-                toast.error(`Only ${product.stock} items available!`);
+            if (existingItem.quantity + 1 > currentStock) {
+                toast.error(`Only ${currentStock} items available!`);
                 return;
             }
             existingItem.quantity += 1;
@@ -62,16 +83,18 @@ const ProductPage = () => {
             cart.push({
                 productId: product._id,
                 name: product.name,
-                price: product.discountedPrice || product.price,
+                price: currentDiscountPrice || currentPrice,
                 quantity: 1,
                 imageUrl: product.imageUrl,
-                unit: product.unit
+                unit: selectedVariant ? selectedVariant.name : product.unit,
+                variant: variantName,
+                isVariant: !!product.hasVariants
             });
         }
 
         localStorage.setItem("cart", JSON.stringify(cart));
         window.dispatchEvent(new Event("cartUpdated"));
-        toast.success(`${product.name} added to cart!`);
+        toast.success(`${product.name}${variantName ? ` (${variantName})` : ''} added to cart!`);
     };
 
     if (loading) return (
@@ -110,20 +133,49 @@ const ProductPage = () => {
                     <div className="mb-6">
                         <span className="text-sm font-bold text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full">{product.category}</span>
                         <h1 className="text-4xl font-bold text-gray-900 mt-4 mb-2">{product.name}</h1>
-                        <p className="text-gray-500 font-medium">Quantity: {product.unit}</p>
+                        {!product.hasVariants && (
+                            <p className="text-gray-500 font-medium">Quantity: {product.unit}</p>
+                        )}
                     </div>
 
+                    {/* Variant Selector */}
+                    {product.hasVariants && product.variants && product.variants.length > 0 && (
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Select Size/Quantity</label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {product.variants.map((variant) => (
+                                    <button
+                                        key={variant.name}
+                                        onClick={() => setSelectedVariant(variant)}
+                                        className={`p-3 rounded-xl border-2 transition-all ${selectedVariant?.name === variant.name
+                                            ? 'border-green-600 bg-green-50 text-green-700'
+                                            : 'border-gray-200 hover:border-green-300 text-gray-700'
+                                            }`}
+                                    >
+                                        <div className="font-bold text-sm">{variant.name}</div>
+                                        <div className="text-xs mt-1">
+                                            ₹{variant.discountedPrice || variant.price}
+                                        </div>
+                                        <div className={`text-xs mt-1 ${variant.stock <= 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                                            {variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-4 mb-8">
-                        {product.discountedPrice && product.discountedPrice < product.price ? (
+                        {currentDiscountPrice && currentDiscountPrice < currentPrice ? (
                             <>
-                                <span className="text-4xl font-bold text-gray-900">₹{product.discountedPrice}</span>
-                                <span className="text-gray-400 line-through text-lg">₹{product.price}</span>
+                                <span className="text-4xl font-bold text-gray-900">₹{currentDiscountPrice}</span>
+                                <span className="text-gray-400 line-through text-lg">₹{currentPrice}</span>
                                 <span className="bg-red-100 text-red-600 px-2 py-1 rounded font-bold text-sm">
-                                    Save {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}%
+                                    Save {Math.round(((currentPrice - currentDiscountPrice) / currentPrice) * 100)}%
                                 </span>
                             </>
                         ) : (
-                            <span className="text-4xl font-bold text-gray-900">₹{product.price}</span>
+                            <span className="text-4xl font-bold text-gray-900">₹{currentPrice}</span>
                         )}
                     </div>
 
@@ -145,11 +197,11 @@ const ProductPage = () => {
 
                     <button
                         onClick={addToCart}
-                        disabled={product.stock <= 0}
-                        className="w-full flex items-center justify-center gap-3 bg-green-600 text-white py-4 rounded-xl font-bold hover:bg-green-700 transition disabled:opacity-50"
+                        disabled={currentStock <= 0}
+                        className="w-full flex items-center justify-center gap-3 bg-green-600 text-white py-4 rounded-xl font-bold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ShoppingCart size={22} />
-                        {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                        {currentStock > 0 ? "Add to Cart" : "Out of Stock"}
                     </button>
 
                     <p className="text-center text-xs text-gray-400 mt-4 font-medium uppercase tracking-widest italic">Pickup available at store location</p>

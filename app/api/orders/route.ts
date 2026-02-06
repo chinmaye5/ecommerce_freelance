@@ -42,18 +42,38 @@ export async function POST(request: Request) {
         await connectDB();
         const body = await request.json();
 
-        // Stock Check
+        // Stock Check & Deduction
         for (const item of body.items) {
             const product = await Product.findById(item.productId);
             if (!product) {
                 return NextResponse.json({ error: `Product ${item.name} not found` }, { status: 404 });
             }
-            if (product.stock < item.quantity) {
-                return NextResponse.json(
-                    { error: `Insufficient stock for ${item.name}. Available: ${product.stock}` },
-                    { status: 400 }
-                );
+
+            if (item.variant) {
+                const variant = product.variants.find((v: any) => v.name === item.variant);
+                if (!variant) {
+                    return NextResponse.json({ error: `Variant ${item.variant} not found for ${item.name}` }, { status: 404 });
+                }
+                if (variant.stock < item.quantity) {
+                    return NextResponse.json(
+                        { error: `Insufficient stock for ${item.name} (${item.variant}). Available: ${variant.stock}` },
+                        { status: 400 }
+                    );
+                }
+                // Deduct stock
+                variant.stock -= item.quantity;
+                // Also update main stock count for cache/display
+                product.stock -= item.quantity;
+            } else {
+                if (product.stock < item.quantity) {
+                    return NextResponse.json(
+                        { error: `Insufficient stock for ${item.name}. Available: ${product.stock}` },
+                        { status: 400 }
+                    );
+                }
+                product.stock -= item.quantity;
             }
+            await product.save();
         }
 
         const order = await Order.create({

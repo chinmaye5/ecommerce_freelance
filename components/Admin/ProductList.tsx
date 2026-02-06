@@ -12,6 +12,13 @@ interface Product {
     category: string;
     stock: number;
     unit: string;
+    hasVariants?: boolean;
+    variants?: Array<{
+        name: string;
+        price: number;
+        discountedPrice?: number;
+        stock: number;
+    }>;
 }
 
 const AdminProductList = ({ onEdit }: { onEdit: (product: Product) => void }) => {
@@ -80,11 +87,31 @@ const AdminProductList = ({ onEdit }: { onEdit: (product: Product) => void }) =>
                                         {product.category}
                                     </span>
                                 </td>
-                                <td className="p-4 font-bold text-gray-900">₹{product.price}</td>
                                 <td className="p-4">
-                                    <span className={`font-medium ${product.stock <= 5 ? "text-red-600" : "text-gray-600"}`}>
-                                        {product.stock} {product.unit}
-                                    </span>
+                                    {(product as any).hasVariants ? (
+                                        <div className="space-y-1">
+                                            <p className="text-xs font-bold text-purple-600 uppercase">Multiple Options</p>
+                                            {(product as any).variants?.slice(0, 2).map((v: any, i: number) => (
+                                                <p key={i} className="text-xs text-gray-600">• {v.name}: ₹{v.discountedPrice || v.price}</p>
+                                            ))}
+                                            {(product as any).variants?.length > 2 && (
+                                                <p className="text-xs text-gray-400 italic">+{(product as any).variants.length - 2} more</p>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="font-bold text-gray-900">₹{product.price}</span>
+                                    )}
+                                </td>
+                                <td className="p-4">
+                                    {(product as any).hasVariants ? (
+                                        <div className="text-xs text-gray-600">
+                                            {(product as any).variants?.reduce((sum: number, v: any) => sum + v.stock, 0)} total
+                                        </div>
+                                    ) : (
+                                        <span className={`font-medium ${product.stock <= 5 ? "text-red-600" : "text-gray-600"}`}>
+                                            {product.stock} {product.unit}
+                                        </span>
+                                    )}
                                 </td>
                                 <td className="p-4">
                                     <div className="flex items-center gap-2">
@@ -133,9 +160,15 @@ const AdminProductList = ({ onEdit }: { onEdit: (product: Product) => void }) =>
                                 <Tag size={10} />
                                 {product.category}
                             </span>
-                            <span className={`text-xs font-medium ${product.stock <= 5 ? "text-red-600" : "text-gray-600"}`}>
-                                Stock: {product.stock} {product.unit}
-                            </span>
+                            {(product as any).hasVariants ? (
+                                <span className="text-xs font-medium text-purple-600">
+                                    {(product as any).variants?.length} options
+                                </span>
+                            ) : (
+                                <span className={`text-xs font-medium ${product.stock <= 5 ? "text-red-600" : "text-gray-600"}`}>
+                                    Stock: {product.stock} {product.unit}
+                                </span>
+                            )}
                         </div>
 
                         <div className="flex gap-2 pt-2">
