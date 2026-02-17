@@ -113,109 +113,142 @@ const ProductPage = () => {
     if (!product) return <div className="p-20 text-center font-bold text-gray-400">Product not found.</div>;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-12">
-            <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-green-600 font-medium mb-12">
-                <ArrowLeft size={18} /> Back to Products
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
+            <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-emerald-600 font-bold mb-12 transition-colors uppercase tracking-widest text-xs group">
+                <div className="p-2 bg-white rounded-xl shadow-sm border border-gray-100 group-hover:border-emerald-100 transition-all">
+                    <ArrowLeft size={16} />
+                </div>
+                Back to Products
             </Link>
 
-            <div className="flex flex-col md:flex-row gap-12 lg:gap-20 mb-20 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex flex-col md:flex-row gap-12 lg:gap-24 mb-32">
                 {/* Image Section */}
-                <div className="w-full md:w-1/2 bg-gray-50 rounded-xl overflow-hidden border border-gray-50">
-                    <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                    />
+                <div className="w-full md:w-1/2 product-image-container relative">
+                    <div className="aspect-[4/5] bg-white rounded-[3rem] overflow-hidden border border-emerald-50/50 shadow-2xl p-4">
+                        <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="w-full h-full object-cover rounded-[2.5rem]"
+                        />
+                    </div>
+                    {currentStock <= 0 && (
+                        <div className="absolute top-8 right-8 bg-gray-900/90 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-2xl">
+                            Out of Stock
+                        </div>
+                    )}
                 </div>
 
                 {/* Details Section */}
-                <div className="w-full md:w-1/2 py-4">
-                    <div className="mb-6">
-                        <span className="text-sm font-bold text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full">{product.category}</span>
-                        <h1 className="text-4xl font-bold text-gray-900 mt-4 mb-2">{product.name}</h1>
+                <div className="w-full md:w-1/2 py-6">
+                    <div className="mb-8">
+                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100/50">{product.category}</span>
+                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mt-8 mb-4 tracking-tight leading-tight">{product.name}</h1>
                         {!product.hasVariants && (
-                            <p className="text-gray-500 font-medium">Quantity: {product.unit}</p>
+                            <div className="flex items-center gap-2 text-emerald-600/60 font-medium bg-emerald-50/50 w-fit px-4 py-1 rounded-full text-sm">
+                                <CheckCircle2 size={14} />
+                                Quantity: {product.unit}
+                            </div>
                         )}
                     </div>
 
                     {/* Variant Selector */}
                     {product.hasVariants && product.variants && product.variants.length > 0 && (
-                        <div className="mb-6">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Select Size/Quantity</label>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="mb-10 lg:mb-12">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Available Options</label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                 {product.variants.map((variant) => (
                                     <button
                                         key={variant.name}
                                         onClick={() => setSelectedVariant(variant)}
-                                        className={`p-3 rounded-xl border-2 transition-all ${selectedVariant?.name === variant.name
-                                            ? 'border-green-600 bg-green-50 text-green-700'
-                                            : 'border-gray-200 hover:border-green-300 text-gray-700'
+                                        className={`p-5 rounded-[2rem] border-2 transition-all text-left group/v relative ${selectedVariant?.name === variant.name
+                                            ? 'border-emerald-600 bg-emerald-600 text-white shadow-xl shadow-emerald-500/20'
+                                            : 'border-gray-100 bg-white hover:border-emerald-200 text-gray-700 shadow-sm'
                                             }`}
                                     >
-                                        <div className="font-bold text-sm">{variant.name}</div>
-                                        <div className="text-xs mt-1">
+                                        <div className="font-black text-sm mb-1">{variant.name}</div>
+                                        <div className={`text-xs font-bold ${selectedVariant?.name === variant.name ? 'text-emerald-100' : 'text-emerald-600'}`}>
                                             ₹{variant.discountedPrice || variant.price}
                                         </div>
-                                        <div className={`text-xs mt-1 ${variant.stock <= 0 ? 'text-red-600' : 'text-gray-500'}`}>
-                                            {variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}
-                                        </div>
+                                        {variant.stock <= 5 && variant.stock > 0 && (
+                                            <div className="absolute top-2 right-2 flex gap-1">
+                                                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                                            </div>
+                                        )}
                                     </button>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    <div className="flex items-center gap-4 mb-8">
+                    <div className="flex items-center gap-6 mb-12">
                         {currentDiscountPrice && currentDiscountPrice < currentPrice ? (
-                            <>
-                                <span className="text-4xl font-bold text-gray-900">₹{currentDiscountPrice}</span>
-                                <span className="text-gray-400 line-through text-lg">₹{currentPrice}</span>
-                                <span className="bg-red-100 text-red-600 px-2 py-1 rounded font-bold text-sm">
-                                    Save {Math.round(((currentPrice - currentDiscountPrice) / currentPrice) * 100)}%
-                                </span>
-                            </>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-5xl font-black text-gray-900 tracking-tighter">₹{currentDiscountPrice}</span>
+                                    <span className="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-xl font-black text-xs uppercase tracking-widest border border-emerald-100/50">
+                                        Save {Math.round(((currentPrice - currentDiscountPrice) / currentPrice) * 100)}%
+                                    </span>
+                                </div>
+                                <span className="text-gray-400 line-through text-lg font-medium mt-1 ml-1 tracking-tight">Reg: ₹{currentPrice}</span>
+                            </div>
                         ) : (
-                            <span className="text-4xl font-bold text-gray-900">₹{currentPrice}</span>
+                            <span className="text-5xl font-black text-gray-900 tracking-tighter">₹{currentPrice}</span>
                         )}
                     </div>
 
-                    <div className="mb-10 text-gray-600 transition-all">
-                        <h3 className="font-bold text-gray-900 mb-2">About this product</h3>
-                        <p className="leading-relaxed">{product.description}</p>
+                    <div className="space-y-4 mb-12">
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Product Information</h3>
+                        <p className="text-gray-600 leading-relaxed font-light text-lg">{product.description}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-10">
-                        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <ShieldCheck className="text-green-600" size={24} />
-                            <span className="text-sm font-bold text-gray-700">Highest Quality</span>
+                    <div className="grid grid-cols-2 gap-6 mb-12">
+                        <div className="flex items-center gap-4 p-5 bg-emerald-50/30 rounded-[2rem] border border-emerald-50">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-50">
+                                <ShieldCheck size={24} />
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-900 uppercase tracking-wider">Premium Quality</p>
+                                <p className="text-[10px] text-gray-500 font-medium">100% Guaranteed</p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <CheckCircle2 className="text-blue-600" size={24} />
-                            <span className="text-sm font-bold text-gray-700">Store Pickup</span>
+                        <div className="flex items-center gap-4 p-5 bg-amber-50/30 rounded-[2rem] border border-amber-50">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-50">
+                                <CheckCircle2 size={24} />
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-900 uppercase tracking-wider">Store Pickup</p>
+                                <p className="text-[10px] text-gray-500 font-medium">Fast & Convenient</p>
+                            </div>
                         </div>
                     </div>
 
                     <button
                         onClick={addToCart}
                         disabled={currentStock <= 0}
-                        className="w-full flex items-center justify-center gap-3 bg-green-600 text-white py-4 rounded-xl font-bold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-4 bg-emerald-600 text-white py-6 rounded-[2rem] font-black text-xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-600/30 active:scale-95 disabled:opacity-50 disabled:bg-gray-400 group"
                     >
-                        <ShoppingCart size={22} />
+                        <ShoppingCart size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         {currentStock > 0 ? "Add to Cart" : "Out of Stock"}
                     </button>
 
-                    <p className="text-center text-xs text-gray-400 mt-4 font-medium uppercase tracking-widest italic">Pickup available at store location</p>
+                    <div className="mt-8 flex items-center justify-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">In-Store Pickup only for now</p>
+                    </div>
                 </div>
             </div>
 
             {/* Recommendations Section */}
             {recommendations.length > 0 && (
-                <div className="border-t border-gray-100 pt-16">
-                    <div className="flex justify-between items-center mb-10">
-                        <h2 className="text-2xl font-bold text-gray-900">Related Products</h2>
-                        <Link href={`/?category=${product.category}`} className="text-green-600 font-bold hover:underline">View All</Link>
+                <div className="border-t border-emerald-50 pt-24 mb-12">
+                    <div className="flex justify-between items-end mb-16">
+                        <div>
+                            <h2 className="text-4xl font-black text-gray-900 tracking-tight">You might also love</h2>
+                            <div className="h-1.5 w-24 bg-gradient-to-r from-emerald-500 to-emerald-300 rounded-full mt-4"></div>
+                        </div>
+                        <Link href={`/?category=${product.category}`} className="text-emerald-600 font-black hover:text-emerald-700 transition-colors uppercase tracking-[0.2em] text-[10px] mb-2">View All</Link>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {recommendations.map(p => (
                             <ProductCard key={p._id} product={p} />
                         ))}

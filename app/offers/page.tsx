@@ -44,72 +44,77 @@ export default function OffersPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+        <div className="min-h-screen bg-[#fafafa]">
             {/* Header */}
-            <div className="bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 py-8 md:py-16 px-4 shadow-2xl relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/10"></div>
-                <div className="absolute top-0 left-0 w-full h-full">
-                    <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-                    <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse delay-75"></div>
-                </div>
+            <div className="bg-gradient-to-br from-amber-500 via-orange-600 to-red-700 py-16 md:py-24 px-4 shadow-2xl relative overflow-hidden">
+                {/* Subtle Background Elements */}
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
 
                 <div className="max-w-7xl mx-auto relative z-10">
                     <button
                         onClick={() => router.push("/")}
-                        className="mb-4 md:mb-6 flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
+                        className="mb-8 flex items-center gap-2 text-white/80 hover:text-white transition-all group uppercase tracking-[0.2em] text-[10px] font-black"
                     >
-                        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="font-semibold text-sm md:text-base">Back to Home</span>
+                        <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all">
+                            <ArrowLeft size={16} />
+                        </div>
+                        Back to Shop
                     </button>
 
                     <div className="text-center">
-                        <div className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full mb-4 md:mb-6 border border-white/30">
-                            <Flame className="text-yellow-300 animate-pulse" size={20} />
-                            <span className="text-white font-bold text-xs md:text-sm uppercase tracking-wider">Limited Time Deals</span>
+                        <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-2 rounded-full mb-8 border border-white/20">
+                            <Flame className="text-amber-300 animate-pulse" size={20} />
+                            <span className="text-white font-black text-xs uppercase tracking-widest">Unmissable Savings</span>
                         </div>
 
-                        <h1 className="text-3xl md:text-6xl font-extrabold text-white mb-3 md:mb-4 drop-shadow-lg">
-                            Special Offers
+                        <h1 className="text-4xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-tight drop-shadow-2xl">
+                            Special <span className="text-amber-300">Offers</span>
                         </h1>
-                        <p className="text-white/90 text-base md:text-xl max-w-2xl mx-auto font-medium">
-                            Grab amazing deals on your favorite products before they're gone!
+                        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                            Premium products at exclusive prices. Discover handpicked deals
+                            designed to bring you the best value for your daily essentials.
                         </p>
                     </div>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+            <div className="max-w-7xl mx-auto px-4 py-16">
                 {loading ? (
                     <div className="text-center py-20">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-600 border-t-transparent"></div>
-                        <p className="mt-4 text-gray-600 font-semibold">Loading amazing offers...</p>
+                        <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                        <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Curating Deals...</p>
                     </div>
                 ) : offers.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-2xl shadow-lg border border-gray-100">
-                        <Tag className="mx-auto text-gray-300 mb-4" size={64} />
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">No Offers Available</h2>
-                        <p className="text-gray-500 mb-6">Check back soon for exciting deals!</p>
+                    <div className="text-center py-24 bg-white rounded-[3rem] shadow-2xl shadow-emerald-900/5 border border-emerald-50 max-w-2xl mx-auto">
+                        <div className="w-24 h-24 bg-emerald-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-emerald-100">
+                            <Tag className="text-emerald-300" size={48} />
+                        </div>
+                        <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">No Offers Today</h2>
+                        <p className="text-gray-500 mb-10 font-light">We're working on some exciting new deals. Check back soon for premium savings!</p>
                         <button
                             onClick={() => router.push("/")}
-                            className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg"
+                            className="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
                         >
                             Browse All Products
                         </button>
                     </div>
                 ) : (
                     <>
-                        <div className="mb-6 md:mb-8">
-                            <div className="flex items-center gap-2 md:gap-3 mb-2">
-                                <Percent className="text-orange-600" size={24} />
-                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                    {offers.length} Hot {offers.length === 1 ? "Deal" : "Deals"}
+                        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div>
+                                <h2 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-4">
+                                    Today&apos;s <span className="text-emerald-600">Hot Deals</span>
                                 </h2>
+                                <div className="h-1.5 w-24 bg-gradient-to-r from-amber-500 to-orange-400 rounded-full mt-4"></div>
                             </div>
-                            <div className="h-1 w-20 md:w-24 bg-gradient-to-r from-orange-600 to-pink-600 rounded-full"></div>
+                            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm">
+                                {offers.length} Premium Offers Available
+                            </p>
                         </div>
 
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {offers.map((product) => {
                                 const discount = calculateDiscount(product.price, product.discountedPrice);
                                 const finalPrice = product.discountedPrice || product.price;
@@ -119,76 +124,69 @@ export default function OffersPage() {
                                     <div
                                         key={product._id}
                                         onClick={() => !isOutOfStock && router.push(`/product/${product._id}`)}
-                                        className={`group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-orange-400 ${!isOutOfStock ? "cursor-pointer" : "opacity-75"
-                                            }`}
+                                        className={`group bg-white rounded-[2.5rem] p-3 shadow-sm hover:shadow-2xl transition-all duration-500 border border-emerald-50/50 flex flex-col relative h-full ${!isOutOfStock ? "cursor-pointer" : "opacity-75"}`}
                                     >
-                                        <div className="relative overflow-hidden aspect-square">
+                                        <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-gray-50 mb-4">
                                             <img
                                                 src={product.imageUrl}
                                                 alt={product.name}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             />
 
-                                            {/* Offer Badge */}
-                                            <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1.5 rounded-full font-bold text-xs shadow-lg flex items-center gap-1 animate-pulse">
-                                                <Flame size={14} />
-                                                OFFER
+                                            {/* Offer Badges */}
+                                            <div className="absolute top-4 left-4 flex flex-col gap-2">
+                                                <div className="bg-amber-500 text-white px-3 py-1.5 rounded-full font-black text-[10px] shadow-lg flex items-center gap-1 uppercase tracking-widest animate-pulse">
+                                                    <Flame size={12} />
+                                                    Deal
+                                                </div>
+                                                {discount > 0 && (
+                                                    <div className="bg-white text-emerald-700 px-3 py-1.5 rounded-full font-black text-xs shadow-lg border border-emerald-100">
+                                                        {discount}% OFF
+                                                    </div>
+                                                )}
                                             </div>
 
-                                            {/* Discount Badge */}
-                                            {discount > 0 && (
-                                                <div className="absolute top-3 right-3 bg-green-600 text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-lg">
-                                                    {discount}% OFF
-                                                </div>
-                                            )}
-
-                                            {/* Out of Stock Overlay */}
                                             {isOutOfStock && (
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                                    <span className="bg-red-600 text-white px-6 py-2 rounded-full font-bold text-sm">
-                                                        OUT OF STOCK
+                                                <div className="absolute inset-0 bg-white/60 flex items-center justify-center backdrop-blur-[2px]">
+                                                    <span className="bg-gray-900 text-white px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl">
+                                                        Out of Stock
                                                     </span>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="p-3 md:p-4">
-                                            <div className="mb-2">
-                                                <span className="text-[10px] md:text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
+                                        <div className="px-4 pb-4 flex flex-col flex-1">
+                                            <div className="mb-4">
+                                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2 block">
                                                     {product.category}
                                                 </span>
+                                                <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
+                                                    {product.name}
+                                                </h3>
                                             </div>
 
-                                            <h3 className="font-bold text-gray-900 text-sm md:text-lg mb-1 md:mb-2 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                                                {product.name}
-                                            </h3>
-
-
-
-                                            <div className="flex items-center justify-between">
+                                            <div className="mt-auto pt-4 border-t border-emerald-50/50 flex items-center justify-between">
                                                 <div className="flex flex-col">
                                                     {product.discountedPrice ? (
                                                         <>
-                                                            <span className="text-xs md:text-sm text-gray-400 line-through">
+                                                            <span className="text-xs text-gray-400 line-through font-medium">
                                                                 ₹{product.price}
                                                             </span>
-                                                            <span className="text-lg md:text-2xl font-bold text-orange-600">
+                                                            <span className="text-2xl font-black text-emerald-700 tracking-tighter">
                                                                 ₹{finalPrice}
                                                             </span>
                                                         </>
                                                     ) : (
-                                                        <span className="text-lg md:text-2xl font-bold text-gray-900">
+                                                        <span className="text-2xl font-black text-gray-900 tracking-tighter">
                                                             ₹{finalPrice}
                                                         </span>
                                                     )}
-                                                    <span className="text-[10px] md:text-xs text-gray-500">per {product.unit}</span>
+                                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">per {product.unit}</span>
                                                 </div>
 
-                                                {!isOutOfStock && (
-                                                    <div className="bg-green-50 text-green-700 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-bold">
-                                                        {product.stock}
-                                                    </div>
-                                                )}
+                                                <div className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-100/50">
+                                                    Stock: {product.stock}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

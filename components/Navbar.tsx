@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ShoppingBag, Menu, X, Settings } from "lucide-react";
+import { ShoppingBag, Menu, X, Settings, ChevronDown } from "lucide-react";
 import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
 
 const Navbar = () => {
@@ -50,69 +50,81 @@ const Navbar = () => {
     }, [user, isSignedIn]);
 
     return (
-        <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-emerald-50/50 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
-                    <img src="/logo.png" alt="Keshava Kiranam Logo" className="w-8 h-8 object-contain rounded" />
-                    <span className="text-xl font-bold tracking-tight text-gray-900">Keshava Kiranam</span>
+                <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+                    <div className="p-1 rounded-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                        <img src="/logo.png" alt="Keshava Kiranam Logo" className="w-12 h-12 md:w-10 md:h-10 object-contain" />
+                    </div>
+                    <span className="text-lg md:text-2xl font-black tracking-tighter text-gray-900 group-hover:text-emerald-700 transition-colors leading-tight">Keshava Kiranam</span>
                 </Link>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-8">
-                    <Link href="/" className={`text-sm font-medium ${pathname === "/" ? "text-green-600" : "text-gray-600 hover:text-gray-900"}`}>
+                <div className="hidden md:flex items-center gap-10">
+                    <Link href="/" className={`text-sm font-bold tracking-wide uppercase ${pathname === "/" ? "text-emerald-600" : "text-gray-500 hover:text-emerald-600"} transition-colors`}>
                         Home
                     </Link>
-                    <Link href="/offers" className={`text-sm font-medium flex items-center gap-1 ${pathname === "/offers" ? "text-orange-600" : "text-gray-600 hover:text-orange-600"}`}>
-                        Offers
+                    <Link href="/offers" className={`text-sm font-bold tracking-wide uppercase flex items-center gap-1 ${pathname === "/offers" ? "text-amber-600" : "text-gray-500 hover:text-amber-600"} transition-colors`}>
+                        <span className="text-base">🔥</span> Offers
                     </Link>
-                    <Link href="/my-orders" className={`text-sm font-medium ${pathname === "/my-orders" ? "text-green-600" : "text-gray-600 hover:text-gray-900"}`}>
+                    <Link href="/my-orders" className={`text-sm font-bold tracking-wide uppercase ${pathname === "/my-orders" ? "text-emerald-600" : "text-gray-500 hover:text-emerald-600"} transition-colors`}>
                         My Orders
                     </Link>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-4">
                     {isAdmin && (
-                        <Link href="/admin" className="text-gray-500 hover:text-gray-900">
-                            <Settings size={20} />
+                        <Link href="/admin" className="p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+                            <Settings size={22} />
                         </Link>
                     )}
 
-                    <Link href="/cart" className="relative p-2 text-gray-600 hover:text-gray-900">
-                        <ShoppingBag size={22} />
+                    <Link href="/cart" className="group relative p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+                        <ShoppingBag size={24} className="group-hover:scale-110 transition-transform" />
                         {cartCount > 0 && (
-                            <span className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                            <span className="absolute top-1 right-1 bg-emerald-600 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
                                 {cartCount}
                             </span>
                         )}
                     </Link>
 
-                    <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
+                    <div className="h-8 w-px bg-gray-100 hidden md:block mx-1"></div>
 
                     {isSignedIn ? (
-                        <UserButton afterSignOutUrl="/" />
+                        <div className="scale-110">
+                            <UserButton afterSignOutUrl="/" />
+                        </div>
                     ) : (
                         <SignInButton mode="modal">
-                            <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition">
+                            <button className="bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
                                 Sign In
                             </button>
                         </SignInButton>
                     )}
 
-                    <button className="md:hidden p-1 text-gray-600" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                    <button className="md:hidden p-2 text-gray-500 hover:bg-gray-50 rounded-xl transition-all" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
             </div>
 
             {mobileMenuOpen && (
-                <div className="md:hidden bg-white border-b border-gray-100 p-4 space-y-3">
-                    <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-600 font-medium">Home</Link>
-                    <Link href="/offers" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-orange-600 font-medium">Offers</Link>
-                    <Link href="/my-orders" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-600 font-medium">My Orders</Link>
+                <div className="md:hidden bg-white border-t border-gray-100 p-6 space-y-4 animate-in slide-in-from-top-4 duration-300">
+                    <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-gray-900 font-bold border-b border-gray-50">
+                        Home <ChevronDown size={14} className="-rotate-90 text-gray-300" />
+                    </Link>
+                    <Link href="/offers" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-amber-600 font-bold border-b border-gray-50">
+                        Offers <ChevronDown size={14} className="-rotate-90 text-amber-300" />
+                    </Link>
+                    <Link href="/my-orders" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-gray-900 font-bold border-b border-gray-50">
+                        My Orders <ChevronDown size={14} className="-rotate-90 text-gray-300" />
+                    </Link>
                     {isAdmin && (
-                        <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-600 font-medium">Admin Dashboard</Link>
+                        <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between py-3 text-emerald-600 font-bold">
+                            Admin Dashboard <Settings size={18} />
+                        </Link>
                     )}
                 </div>
             )}

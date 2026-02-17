@@ -35,29 +35,33 @@ const CategoryFilter = ({ selectedCategory, onSelect }: {
     </div>;
 
     return (
-        <div className="flex flex-row md:flex-col gap-2 overflow-x-auto no-scrollbar md:overflow-visible pb-2 md:pb-0">
+        <div className="flex flex-row md:flex-col gap-3 overflow-x-auto no-scrollbar md:overflow-visible pb-4 md:pb-0">
             <button
                 onClick={() => onSelect("")}
-                className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-between whitespace-nowrap md:whitespace-normal border ${selectedCategory === ""
-                        ? "bg-green-600 text-white border-green-600 shadow-sm"
-                        : "bg-white text-gray-600 border-gray-200 hover:border-green-600 hover:text-green-600"
+                className={`px-5 py-3.5 rounded-2xl text-sm font-bold transition-all flex items-center justify-between whitespace-nowrap md:whitespace-normal border-2 ${selectedCategory === ""
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-xl shadow-emerald-600/20 active:scale-95"
+                    : "bg-white text-gray-500 border-gray-100/80 hover:border-emerald-200 hover:text-emerald-700 hover:bg-emerald-50/30"
                     }`}
             >
                 All Products
-                <ChevronRight size={14} className="hidden md:block opacity-50" />
+                <div className={`p-1 rounded-full ${selectedCategory === "" ? "bg-emerald-500" : "bg-gray-100 group-hover:bg-emerald-100"} transition-colors hidden md:block`}>
+                    <ChevronRight size={14} className={selectedCategory === "" ? "text-white" : "text-gray-400"} />
+                </div>
             </button>
 
             {categories.map((cat) => (
                 <button
                     key={cat._id}
                     onClick={() => onSelect(cat.name)}
-                    className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-between whitespace-nowrap md:whitespace-normal border ${selectedCategory === cat.name
-                            ? "bg-green-600 text-white border-green-600 shadow-sm"
-                            : "bg-white text-gray-600 border-gray-200 hover:border-green-600 hover:text-green-600"
+                    className={`px-5 py-3.5 rounded-2xl text-sm font-bold transition-all flex items-center justify-between whitespace-nowrap md:whitespace-normal border-2 ${selectedCategory === cat.name
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-xl shadow-emerald-600/20 active:scale-95"
+                        : "bg-white text-gray-500 border-gray-100/80 hover:border-emerald-200 hover:text-emerald-700 hover:bg-emerald-50/30"
                         }`}
                 >
                     {cat.name}
-                    <ChevronRight size={14} className="hidden md:block opacity-50" />
+                    <div className={`p-1 rounded-full ${selectedCategory === cat.name ? "bg-emerald-500" : "bg-gray-100 group-hover:bg-emerald-100"} transition-colors hidden md:block`}>
+                        <ChevronRight size={14} className={selectedCategory === cat.name ? "text-white" : "text-gray-400"} />
+                    </div>
                 </button>
             ))}
         </div>

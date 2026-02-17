@@ -43,9 +43,9 @@ const ProductList = ({ category, search }: { category?: string; search?: string 
 
     if (loading) {
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <div key={i} className="aspect-square bg-gray-100 rounded-xl animate-pulse"></div>
+                    <div key={i} className="aspect-[4/5] bg-gray-100 rounded-[2.5rem] animate-pulse"></div>
                 ))}
             </div>
         );
@@ -53,17 +53,17 @@ const ProductList = ({ category, search }: { category?: string; search?: string 
 
     if (products.length === 0) {
         return (
-            <div className="col-span-full py-20 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="text-gray-400" size={32} />
+            <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-emerald-50 shadow-xl shadow-emerald-900/5">
+                <div className="w-20 h-20 bg-emerald-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+                    <Search className="text-emerald-300" size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No items found</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">We couldn't find any products matching your search. Try different keywords or browse all categories.</p>
+                <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">No Items Found</h3>
+                <p className="text-gray-500 max-w-sm mx-auto font-light">We searched everywhere but couldn't find matches. Try refreshing or using different keywords.</p>
                 <button
                     onClick={() => window.location.href = '/'}
-                    className="mt-6 text-green-600 font-bold hover:underline"
+                    className="mt-8 bg-emerald-50 text-emerald-600 px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-100 transition-all active:scale-95"
                 >
-                    Clear Filters
+                    Clear All Filters
                 </button>
             </div>
         );
