@@ -43,7 +43,7 @@ Keshavakiranam is a full-stack e-commerce solution designed with a focus on mode
 
 1. Clone the repository:
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/chinmaye5/ecommerce_freelance.git
    ```
 
 2. Install dependencies:
